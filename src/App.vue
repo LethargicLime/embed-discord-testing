@@ -1,26 +1,30 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { ref as storageRef, getDownloadURL, listAll } from "firebase/storage"
+import { storage } from "./firebase"
 
-const url = ref( null );
+const url = ref( "" );
 
-function handleFileUpload(e) {
-  const f = e.target.files[0];
+const loadVideo = async () => {
+  const vFolderRef = storageRef(storage, "");
+  const result = await listAll(vFolderRef);
 
-  if (f && f.type.startsWith("video/")) {
-    url.value = URL.createObjectURL(f);
-  } else {
-    alert("video nimwit");
+  if (result.items.length > 0) {
+    const t = await getDownloadURL(result.items[0]);
+
+    url.value = t;
   }
 }
+
+onMounted(() => {
+  loadVideo();
+})
 </script>
 
 <template>
   <div class="absolute">
-    <input type="file" accept="video/*" @change="handleFileUpload" class="mt-2 ml-2 border-1 w-48 rounded border-solid"/>
-
-    <video v-if="url" controls :src="url" class="w-screen h-screen">
-      
-    </video>
+    <div v-if="!url">No video present</div>
+    <video v-else :src="url" controls class="w-screen h-screen" />
   </div>
 </template>
 

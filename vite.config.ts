@@ -7,5 +7,5 @@ export default defineConfig({
   plugins: [vue()
     , tailwindcss()
   ],
-  base: ""
+  base: "/embed-discord-testing/"
 })
